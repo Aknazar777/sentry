@@ -1,0 +1,27 @@
+image: docker-compose
+
+services:
+  - docker:dind
+
+stages:
+#  - build
+  - deploy 
+
+#build:
+#  stage: build
+#  tags:
+#    - sentry-run
+#  only:
+#    - master
+#  script:
+#    - docker-compose build
+
+deploy:
+  stage: deploy
+  tags:
+    - sentry-run
+  only:
+    - master
+  script: 
+    - docker-compose up -d
+  when: manual

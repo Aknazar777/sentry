@@ -1,0 +1,61 @@
+version: '3.7'
+
+services:
+  sentry-base:
+    image: sentry:latest
+    container_name: sentry-base
+    hostname: sentry-base
+    restart: always
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
+    depends_on:
+      - sentry_redis
+    networks:
+      - sentry
+    volumes:
+      - /data/sentry:/var/lib/sentry/files
+
+  sentry_cron:
+    image: sentry:latest
+    container_name: sentry_cron
+    hostname: sentry_cron
+    restart: always
+    command: "sentry run cron"
+    env_file:
+      - .env
+    depends_on:
+      - sentry_redis
+    networks:
+      - sentry
+    volumes:
+     - /data/sentry:/var/lib/sentry/files
+    
+  sentry_worker:
+    image: sentry
+    container_name: sentry_worker
+    hostname: sentry_worker
+    restart: always
+    command: "sentry run worker"
+    env_file:
+      - .env
+    depends_on:
+      - sentry_redis
+    networks:
+      - sentry
+    volumes:
+      - /data/sentry:/var/lib/sentry/files
+
+  sentry_redis:
+    container_name: sentry_redis
+    image: redis:latest
+    hostname: sentry_redis
+    restart: always
+    networks:
+      - sentry
+    volumes:
+      - /data/redis:/data
+networks:
+  sentry:
+    driver: bridge
